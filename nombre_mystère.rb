@@ -50,6 +50,8 @@ loop do
     puts "Tu as réussi en #{7 - attempts} coups!"
   else
     puts "Raté #{name}!!! Tu as épuisé toutes tes tentatives, tu as perdu!!!"
+    puts ''
+    puts "le nombre mystère était: #{mystery_number}."
   end
 
   puts "Veux-tu faire une autre partie #{name} ('o' ou 'n')?"
