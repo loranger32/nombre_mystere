@@ -1,10 +1,3 @@
-=begin
- classes
-  Game (play)
-  mystery number(define_number)
-  player(choose_number, play_again?)
-=end
-
 require 'pry'
 
 class Player
@@ -98,6 +91,7 @@ class Game
   attr_accessor :player, :mystery_number
 
   def play
+    clear_screen
     display_title
     initialize_player
     display_welcome
@@ -121,6 +115,10 @@ class Game
 
   def prompt(message)
     "=> #{message}"
+  end
+
+  def clear_screen
+    system('clear') || system('cls')
   end
 
   def display_welcome
@@ -163,7 +161,7 @@ class Game
   end
 
   def number_found?
-    mystery_number == player.guess
+    mystery_number.current_pick == player.guess
   end
 
   def try_again
@@ -175,6 +173,7 @@ class Game
     elsif player.guess > mystery_number.current_pick
       puts "Le nombre mystère est plus petit."
       player.choose_smaller_number_than(last_guess)
+    else
     end
   end
 
@@ -192,39 +191,5 @@ class Game
     puts "Ok #{player}, on recommence!"
   end
 end
-
-# mystery_number = rand(0..100)
-# guess = ''
-# name = ''
-
-
-# 
-
-# loop do
-#   attempts = 7
-#   puts ''
-#   puts "Ok #{name}, j'ai choisi un nombre entre 1 et 100."
-#   print "Essaie de le devnier, tu as droit à #{attempts} tentative(s): "
-#   guess = gets.to_i
-#   until (1..100).include?(guess)
-#     print "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que 100, essaie encore: "
-#     guess = gets.to_i
-#   end
-#   attempts -= 1
-
-#   while guess != mystery_number && attempts >= 1
-#     
-#   end
-
-#   if guess == mystery_number
-#     
-#   else
-#     puts "Raté #{name}!!! Tu as épuisé toutes tes tentatives, tu as perdu!!!"
-#   end
-
-#   
-# end
-
-# puts "Au revoir #{name}, à une prochaine fois !!"
 
 Game.new.play
