@@ -1,4 +1,3 @@
-mystery_number = rand(0..100)
 guess = ''
 name = ''
 
@@ -15,9 +14,10 @@ end
 
 loop do
   attempts = 7
+  mystery_number = rand(0..100)
   puts ''
   puts "Ok #{name}, j'ai choisi un nombre entre 1 et 100."
-  print "Essaie de le devnier, tu as droit à #{attempts} tentative(s): "
+  print "Essaie de le deviner, tu as droit à #{attempts} tentative(s): "
   guess = gets.to_i
   until (1..100).include?(guess)
     print "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que 100, essaie encore: "
