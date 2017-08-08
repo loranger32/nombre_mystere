@@ -147,10 +147,7 @@ class Game
   attr_accessor :player, :mystery_number, :stat
 
   def play
-    clear_screen
-    display_title
-    initialize_player
-    display_welcome
+    start_game
     loop do
       initialize_mystery_number
       player.choose_number
@@ -170,6 +167,13 @@ class Game
     @player = nil
     @mystery_number = nil
     @stat = Stats.new
+  end
+
+  def start_game
+    clear_screen
+    display_title
+    initialize_player
+    display_welcome
   end
 
   def display_welcome
@@ -227,14 +231,22 @@ class Game
     last_guess = player.guess
 
     if last_guess < mystery_number.current_pick
-      prompt "Le nombre mystère est plus grand.".red
-      player.choose_bigger_number_than(last_guess)
-      stat.add_attempt
+      request_bigger_number_than(last_guess)
     elsif last_guess > mystery_number.current_pick
-      prompt "Le nombre mystère est plus petit.".blue
-      player.choose_smaller_number_than(last_guess)
-      stat.add_attempt
+      request_smaller_number_than(last_guess)
     end
+  end
+
+  def request_bigger_number_than(last_guess)
+    prompt "Le nombre mystère est plus grand.".red
+    player.choose_bigger_number_than(last_guess)
+    stat.add_attempt
+  end
+
+  def request_smaller_number_than(last_guess)
+    prompt "Le nombre mystère est plus petit.".blue
+    player.choose_smaller_number_than(last_guess)
+    stat.add_attempt
   end
 
   def process_victory
