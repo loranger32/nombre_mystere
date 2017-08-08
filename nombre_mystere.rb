@@ -2,7 +2,7 @@ require 'pry'
 
 module Displayable
   def prompt(message)
-    "=> #{message}"
+    puts "=> #{message}"
   end
 
   def clear_screen
@@ -13,43 +13,43 @@ end
 class Player
   include Displayable
 
-  attr_accessor :name, :guess, :victories
+  attr_accessor :name, :guess
 
   def choose_number
-    print "Essaie de devnier la nombre mystère: "
+    prompt "Entre ton choix: "
     self.guess = gets.to_i
-    until (1..100).include?(guess)
-      print "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que\
+    until (1..100).cover?(guess)
+      prompt "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que\
  100, essaie encore: "
       self.guess = gets.to_i
     end
   end
 
   def choose_bigger_number_than(last_pick)
-    print "Entre un nombre plus grand: "
+    prompt "Entre un nombre plus grand: "
     self.guess = gets.to_i
-    until (1..100).include?(guess)
-      print "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que\
+    until (1..100).cover?(guess)
+      prompt "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que\
  100, essaie encore: "
       self.guess = gets.to_i
     end
-    until self.guess > last_pick
-      print "Tu n'as pas entré un nombre plus grand que #{last_pick},\
+    until guess > last_pick
+      prompt "Tu n'as pas entré un nombre plus grand que #{last_pick},\
  recommence: "
       self.guess = gets.to_i
     end
   end
 
   def choose_smaller_number_than(last_pick)
-    print "Entre un nombre plus petit: "
+    prompt "Entre un nombre plus petit: "
     self.guess = gets.to_i
-    until (1..100).include?(guess)
-      print "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que\
+    until (1..100).cover?(guess)
+      prompt "Tu n'as pas entré un numéro, ou bien le numéro est plus grand que\
  100, essaie encore: "
       self.guess = gets.to_i
     end
-    until self.guess < last_pick
-      print "Tu n'as pas entré un nombre plus petit que #{last_pick},\
+    until guess < last_pick
+      prompt "Tu n'as pas entré un nombre plus petit que #{last_pick},\
  recommence: "
       self.guess = gets.to_i
     end
@@ -60,27 +60,26 @@ class Player
   def initialize
     @name = set_name
     @guess = 0
-    @victories = 0
   end
 
   def set_name
-    puts "Bonjour, comment t'apples-tu ?"
+    prompt "Bonjour, comment t'apples-tu ?"
     name = ''
     loop do
       name = gets.chomp
-      break unless (name.empty?) || (name =~ /\A\s+\z/)
-      puts "Tu n'as rien entré, j'ai besoin d'un nom valide, recommence."
+      break unless name.empty? || name =~ /\A\s+\z/
+      prompt "Tu n'as rien entré, j'ai besoin d'un nom valide, recommence."
     end
     name
-  end
-
-  def add_victory
-    self.victories += 1
   end
 
   def to_s
     name.capitalize
   end
+end
+
+class Stats
+  attr_accessor :victories
 end
 
 class MysteryNumber
@@ -158,7 +157,7 @@ class Game
   end
 
   def process_results
-    loop do 
+    loop do
       break if number_found?
       try_again
     end
@@ -173,13 +172,12 @@ class Game
   def try_again
     last_guess = player.guess
 
-    if player.guess < mystery_number.current_pick
+    if last_guess < mystery_number.current_pick
       prompt "Le nombre mystère est plus grand."
       player.choose_bigger_number_than(last_guess)
-    elsif player.guess > mystery_number.current_pick
+    elsif last_guess > mystery_number.current_pick
       prompt "Le nombre mystère est plus petit."
       player.choose_smaller_number_than(last_guess)
-    else
     end
   end
 
