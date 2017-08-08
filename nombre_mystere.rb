@@ -1,6 +1,18 @@
 require 'pry'
 
+module Displayable
+  def prompt(message)
+    "=> #{message}"
+  end
+
+  def clear_screen
+    system('clear') || system('cls')
+  end
+end
+
 class Player
+  include Displayable
+
   attr_accessor :name, :guess, :victories
 
   def choose_number
@@ -88,6 +100,8 @@ class MysteryNumber
 end
 
 class Game
+  include Displayable
+
   attr_accessor :player, :mystery_number
 
   def play
@@ -113,26 +127,18 @@ class Game
     @mystery_number = nil
   end
 
-  def prompt(message)
-    "=> #{message}"
-  end
-
-  def clear_screen
-    system('clear') || system('cls')
-  end
-
   def display_welcome
-    puts "Bonjour #{player}!"
-    puts "Dans ce jeu, je vais choisir un nombre entre 1 et 100, et tu vas\
+    prompt "Bonjour #{player}!"
+    prompt "Dans ce jeu, je vais choisir un nombre entre 1 et 100, et tu vas\
  devoir le deviner."
   end
 
   def display_goodbye
-    puts "Ok, merci d'avoir joué #{player}, et à une prochaine fois :-)"
+    prompt "Ok, merci d'avoir joué #{player}, et à une prochaine fois :-)"
   end
 
   def show_stats
-    puts "Show stats not imlplemented yet"
+    prompt "Show stats not imlplemented yet"
   end
 
   def display_title
@@ -156,7 +162,7 @@ class Game
       break if number_found?
       try_again
     end
-    puts "Bravo #{player}, tu as trouvé le nombre mystère:\
+    prompt "Bravo #{player}, tu as trouvé le nombre mystère:\
  #{mystery_number}!!!"
   end
 
@@ -168,27 +174,27 @@ class Game
     last_guess = player.guess
 
     if player.guess < mystery_number.current_pick
-      puts "Le nombre mystère est plus grand."
+      prompt "Le nombre mystère est plus grand."
       player.choose_bigger_number_than(last_guess)
     elsif player.guess > mystery_number.current_pick
-      puts "Le nombre mystère est plus petit."
+      prompt "Le nombre mystère est plus petit."
       player.choose_smaller_number_than(last_guess)
     else
     end
   end
 
   def play_again?
-    puts "Veux-tu faire une autre partie #{player} ('o' ou 'n')?"
+    prompt "Veux-tu faire une autre partie #{player} ('o' ou 'n')?"
     answer = gets.chomp.downcase
     until ['o', 'n'].include?(answer)
-      puts "Je n'ai pas compris ton choix. Tu dois entrer 'o' ou 'n'."
+      prompt "Je n'ai pas compris ton choix. Tu dois entrer 'o' ou 'n'."
       answer = gets.chomp.downcase
     end
     answer == 'o' ? true : false
   end
 
   def display_start_again
-    puts "Ok #{player}, on recommence!"
+    prompt "Ok #{player}, on recommence!"
   end
 end
 
