@@ -1,4 +1,5 @@
 require 'pry'
+require 'colorize'
 
 module Displayable
   def prompt(message)
@@ -79,7 +80,49 @@ class Player
 end
 
 class Stats
-  attr_accessor :victories
+  attr_accessor :victories, :defeats, :round_attempts, :total_attempts, :rounds
+
+  def initialize
+    @victories      = 0
+    @defeats        = 0
+    @round_attempts = 0
+    @total_attempts = 0
+    @rounds         = 1
+  end
+
+  def average_attempts
+    total_attempts / rounds
+  end
+
+  def add_victory
+    self.victories += 1
+  end
+
+  def add_defeat
+    self.defeats += 1
+  end
+
+  def add_round
+    self.rounds += 1
+  end
+
+  def add_attempt
+    self.round_attempts += 1
+    self.total_attempts += 1
+  end
+
+  def reset_round_attempts
+    self.round_attempts = 0
+  end
+
+  def to_s
+    "******************\n\
+  Statistiques:\n\
+  - nombres trouvés: #{victories}\n\
+  - tentatives de ce tour: #{round_attempts}\n\
+  - moyenne de tentatives par tour: #{average_attempts}.\n\
+******************".green
+  end
 end
 
 class MysteryNumber
@@ -101,7 +144,7 @@ end
 class Game
   include Displayable
 
-  attr_accessor :player, :mystery_number
+  attr_accessor :player, :mystery_number, :stat
 
   def play
     clear_screen
@@ -111,11 +154,13 @@ class Game
     loop do
       initialize_mystery_number
       player.choose_number
+      stat.add_attempt
       process_results
+      number_found? ? process_victory : process_defeat
+      show_stats
       break unless play_again?
-      display_start_again
+      process_new_game
     end
-    show_stats
     display_goodbye
   end
 
@@ -124,6 +169,7 @@ class Game
   def initialize
     @player = nil
     @mystery_number = nil
+    @stat = Stats.new
   end
 
   def display_welcome
@@ -137,7 +183,7 @@ class Game
   end
 
   def show_stats
-    prompt "Show stats not imlplemented yet"
+    puts stat
   end
 
   def display_title
@@ -161,8 +207,16 @@ class Game
       break if number_found?
       try_again
     end
+  end
+
+  def display_congratulations
     prompt "Bravo #{player}, tu as trouvé le nombre mystère:\
- #{mystery_number}!!!"
+ #{mystery_number}!!!".green
+  end
+
+  def display_lossing_message
+    prompt "Dommage #{player}!!! Tu n'as pas trouvé le nombre mystère,\
+ c'était #{mystery_number}."
   end
 
   def number_found?
@@ -173,12 +227,30 @@ class Game
     last_guess = player.guess
 
     if last_guess < mystery_number.current_pick
-      prompt "Le nombre mystère est plus grand."
+      prompt "Le nombre mystère est plus grand.".red
       player.choose_bigger_number_than(last_guess)
+      stat.add_attempt
     elsif last_guess > mystery_number.current_pick
-      prompt "Le nombre mystère est plus petit."
+      prompt "Le nombre mystère est plus petit.".blue
       player.choose_smaller_number_than(last_guess)
+      stat.add_attempt
     end
+  end
+
+  def process_victory
+    display_congratulations
+    stat.add_victory
+  end
+
+  def process_defeat
+    display_loosing_message
+    stat.add_defeat
+  end
+
+  def process_new_game
+    stat.add_round
+    stat.reset_round_attempts
+    display_start_again
   end
 
   def play_again?
