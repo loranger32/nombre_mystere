@@ -118,7 +118,9 @@ class Stats
   def to_s
     "******************\n\
   Statistiques:\n\
-  - nombres trouvés: #{victories}\n\
+  - tours joué: #{rounds}\n\
+  - parties gagnées: #{victories}\n\
+  - parties perdues: #{defeats}\n\
   - tentatives de ce tour: #{round_attempts}\n\
   - moyenne de tentatives par tour: #{average_attempts}.\n\
 ******************".green
@@ -146,13 +148,12 @@ class Game
 
   attr_accessor :player, :mystery_number, :stat
 
+  MAX_ATTEMPTS = 7
+
   def play
     start_game
     loop do
-      initialize_mystery_number
-      player.choose_number
-      stat.add_attempt
-      process_results
+      process_game
       number_found? ? process_victory : process_defeat
       show_stats
       break unless play_again?
@@ -179,11 +180,11 @@ class Game
   def display_welcome
     prompt "Bonjour #{player}!"
     prompt "Dans ce jeu, je vais choisir un nombre entre 1 et 100, et tu vas\
- devoir le deviner."
+ devoir le deviner. Tu as droit à #{MAX_ATTEMPTS} tentatives."
   end
 
   def display_goodbye
-    prompt "Ok, merci d'avoir joué #{player}, et à une prochaine fois :-)"
+    prompt "Ok, merci d'avoir joué #{player}, et à une prochaine fois :-)".blue
   end
 
   def show_stats
@@ -208,9 +209,13 @@ class Game
 
   def process_results
     loop do
-      break if number_found?
+      break if number_found? || max_attempts_reached?
       try_again
     end
+  end
+
+  def max_attempts_reached?
+    stat.round_attempts >= MAX_ATTEMPTS
   end
 
   def display_congratulations
@@ -218,9 +223,16 @@ class Game
  #{mystery_number}!!!".green
   end
 
-  def display_lossing_message
+  def display_loosing_message
     prompt "Dommage #{player}!!! Tu n'as pas trouvé le nombre mystère,\
  c'était #{mystery_number}."
+  end
+
+  def process_game
+    initialize_mystery_number
+    player.choose_number
+    stat.add_attempt
+    process_results
   end
 
   def number_found?
@@ -237,14 +249,20 @@ class Game
     end
   end
 
+  def display_remaining_attempts
+    prompt "Il te reste #{MAX_ATTEMPTS - stat.round_attempts} tentatives."
+  end
+
   def request_bigger_number_than(last_guess)
     prompt "Le nombre mystère est plus grand.".red
+    display_remaining_attempts
     player.choose_bigger_number_than(last_guess)
     stat.add_attempt
   end
 
   def request_smaller_number_than(last_guess)
     prompt "Le nombre mystère est plus petit.".blue
+    display_remaining_attempts
     player.choose_smaller_number_than(last_guess)
     stat.add_attempt
   end
