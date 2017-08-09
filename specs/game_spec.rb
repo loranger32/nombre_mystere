@@ -4,7 +4,6 @@ require_relative '../stats_class'
 require_relative '../mystery_number_class'
 require_relative '../game_class'
 
-
 describe 'Game' do
 
   context 'when initialized at first' do
