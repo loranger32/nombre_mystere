@@ -5,9 +5,18 @@ class Game
 
   MAX_ATTEMPTS = 7
 
+  def initialize_player
+    self.player = Player.new
+  end
+
+  def initialize_mystery_number
+    self.mystery_number = MysteryNumber.new
+  end
+
   def play
     start_game
     loop do
+      initialize_mystery_number
       process_game
       number_found? ? process_victory : process_defeat
       show_stats
@@ -32,6 +41,14 @@ class Game
     display_welcome
   end
 
+  def display_title
+    title = "Bienvenue dans le jeu NOMBRE MYSTERE"
+    border = ('*' * title.size)
+    puts border.center(110)
+    puts title.center(110)
+    puts border.center(110)
+  end
+
   def display_welcome
     prompt "Bonjour #{player}!"
     prompt "Dans ce jeu, je vais choisir un nombre entre 1 et 100, et tu vas\
@@ -44,22 +61,6 @@ class Game
 
   def show_stats
     puts stat
-  end
-
-  def display_title
-    title = "Bienvenue dans le jeu NOMBRE MYSTERE"
-    border = ('*' * title.size)
-    puts border.center(110)
-    puts title.center(110)
-    puts border.center(110)
-  end
-
-  def initialize_player
-    self.player = Player.new
-  end
-
-  def initialize_mystery_number
-    self.mystery_number = MysteryNumber.new
   end
 
   def process_results
@@ -83,10 +84,13 @@ class Game
  c'était #{mystery_number}."
   end
 
-  def process_game
-    initialize_mystery_number
+  def ask_player_choice
     player.choose_number
     stat.add_attempt
+  end
+
+  def process_game
+    ask_player_choice
     process_results
   end
 
