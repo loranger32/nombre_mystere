@@ -1,22 +1,38 @@
+require 'pry'
+
 class Game
   include Displayable
 
-  attr_accessor :player, :mystery_number, :stat
+  attr_accessor :player, :range, :mystery_number, :optimal_guess_attempts, :stat
 
-  MAX_ATTEMPTS = 7
+  def initialize
+    @player                 = nil
+    @range                  = nil
+    @mystery_number         = nil
+    @optimal_guess_attempts = nil
+    @stat                   = Stats.new
+  end
 
   def initialize_player
     self.player = Player.new
   end
 
-  def initialize_mystery_number
-    self.mystery_number = MysteryNumber.new
+  def initialize_mystery_number(range)
+    self.mystery_number = MysteryNumber.new(range[0], range[1])
+  end
+
+  def initialize_range
+    self.range = player.choose_range
+  end
+
+  def initialize_optimal_guess_attempts
+    self.optimal_guess_attempts = Math.log2(range[1] - range[0]).to_i + 1
   end
 
   def play
     start_game
     loop do
-      initialize_mystery_number
+      initialize_mystery_number(range)
       process_game
       number_found? ? process_victory : process_defeat
       show_stats
@@ -28,16 +44,12 @@ class Game
 
   private
 
-  def initialize
-    @player = nil
-    @mystery_number = nil
-    @stat = Stats.new
-  end
-
   def start_game
     clear_screen
     display_title
     initialize_player
+    initialize_range
+    initialize_optimal_guess_attempts
     display_welcome
   end
 
@@ -51,8 +63,9 @@ class Game
 
   def display_welcome
     prompt "Bonjour #{player}!"
-    prompt "Dans ce jeu, je vais choisir un nombre entre 1 et 100, et tu vas\
- devoir le deviner. Tu as droit à #{MAX_ATTEMPTS} tentatives."
+    prompt "Dans ce jeu, je vais choisir un nombre entre #{range[0]}\
+ et #{range[1]}, et tu vas devoir le deviner.\
+ Tu as droit à #{optimal_guess_attempts} tentatives."
   end
 
   def display_goodbye
@@ -71,7 +84,7 @@ class Game
   end
 
   def max_attempts_reached?
-    stat.round_attempts >= MAX_ATTEMPTS
+    stat.round_attempts >= optimal_guess_attempts
   end
 
   def display_congratulations
@@ -85,7 +98,7 @@ class Game
   end
 
   def ask_player_choice
-    player.choose_number
+    player.choose_number_from(range)
     stat.add_attempt
   end
 
@@ -109,20 +122,20 @@ class Game
   end
 
   def display_remaining_attempts
-    prompt "Il te reste #{MAX_ATTEMPTS - stat.round_attempts} tentatives."
+    prompt "Il te reste #{optimal_guess_attempts - stat.round_attempts} tentatives."
   end
 
   def request_bigger_number_than(last_guess)
     prompt "Le nombre mystère est plus grand.".red
     display_remaining_attempts
-    player.choose_bigger_number_than(last_guess)
+    player.choose_bigger_number_than(last_guess, range)
     stat.add_attempt
   end
 
   def request_smaller_number_than(last_guess)
     prompt "Le nombre mystère est plus petit.".blue
     display_remaining_attempts
-    player.choose_smaller_number_than(last_guess)
+    player.choose_smaller_number_than(last_guess, range)
     stat.add_attempt
   end
 
@@ -139,6 +152,8 @@ class Game
   def process_new_game
     stat.add_round
     stat.reset_round_attempts
+    initialize_range
+    initialize_optimal_guess_attempts
     display_start_again
   end
 
@@ -154,5 +169,7 @@ class Game
 
   def display_start_again
     prompt "Ok #{player}, on recommence!"
+    prompt "Tu dois trouver un nombre entre #{range[0]} et #{range[1]},\
+ en #{optimal_guess_attempts} tentatives."
   end
 end
