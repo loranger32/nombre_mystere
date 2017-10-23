@@ -1,8 +1,8 @@
-require_relative '../displayable_module'
-require_relative '../player_class'
-require_relative '../stats_class'
-require_relative '../mystery_number_class'
-require_relative '../game_class'
+require_relative '../lib/displayable_module'
+require_relative '../lib/player_class'
+require_relative '../lib/stats_class'
+require_relative '../lib/mystery_number_class'
+require_relative '../lib/game_class'
 
 describe 'Game' do
 

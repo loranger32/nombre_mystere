@@ -1,5 +1,5 @@
-require_relative '../displayable_module'
-require_relative '../player_class'
+require_relative '../lib/displayable_module'
+require_relative '../lib/player_class'
 
 describe 'A player' do
 

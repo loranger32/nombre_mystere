@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require 'colorize'
 require_relative 'displayable_module'
 require_relative 'game_class'

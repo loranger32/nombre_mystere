@@ -1,5 +1,5 @@
-require_relative '../displayable_module'
-require_relative '../stats_class'
+require_relative '../lib/displayable_module'
+require_relative '../lib/stats_class'
 
 describe "A stat" do
 
